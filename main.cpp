@@ -1,8 +1,8 @@
 /*
- * Author: ItzCooode
+ * author: Itzcooode
  * 
- * Supported games: Valorant, CS2, Fortnite, Apex Legends, 
- *                  Rainbow Six Siege, Overwatch 2, Minecraft, Roblox
+ * supported games: valorant, cs2, fortnite, apex legends, 
+ *                  rainbow six siege, overwatch 2, minecraft, roblox
  */
 #ifndef UNICODE
 #define UNICODE
@@ -44,7 +44,6 @@
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "uxtheme.lib")
 
-// Color scheme
 static const COLORREF CLR_BG = RGB(12, 12, 18);
 static const COLORREF CLR_PANEL = RGB(20, 20, 30);
 static const COLORREF CLR_CARD = RGB(26, 26, 40);
@@ -57,7 +56,6 @@ static const COLORREF CLR_TEXT = RGB(230, 230, 240);
 static const COLORREF CLR_SUBTEXT = RGB(140, 140, 165);
 static const COLORREF CLR_MUTED = RGB(60, 60, 88);
 
-// Window dimensions
 static const int WIN_W = 520;
 static const int WIN_H = 830;
 static const int GAREA_TOP = 458;
@@ -66,7 +64,6 @@ static const int GAREA_BOT = GAREA_TOP + GAREA_H;
 static const int CARD_H = 76;
 static const int FOOTER_Y = WIN_H - 20;
 
-// Control IDs
 #define ID_CMB_MONITOR 201
 #define ID_CMB_ASPECT 202
 #define ID_CMB_RES 203
@@ -76,7 +73,6 @@ static const int FOOTER_Y = WIN_H - 20;
 #define ID_TRAY_RESTORE 301
 #define ID_TRAY_EXIT 302
 
-// Aspect ratio presets
 struct AP {
   const wchar_t *lbl;
   double ratio;
@@ -87,7 +83,6 @@ static const AP ASPECTS[] = {{L"All", 0.0},         {L"4:3", 4.0 / 3},
                              {L"3:2", 3.0 / 2}};
 static const int ASPECT_CNT = (int)(sizeof(ASPECTS) / sizeof(ASPECTS[0]));
 
-// Display structures
 struct DispMode {
   DWORD w, h, hz;
   wstring label() const {
@@ -102,7 +97,6 @@ struct Monitor {
   DWORD nW = 0, nH = 0;
 };
 
-// Game config formats
 enum class CfgFmt { INI, ValveKV, ColonKV };
 
 struct KeySpec {
@@ -115,14 +109,12 @@ struct GameProfile {
   wstring cfgTpl, exeTpl;
   CfgFmt fmt;
   vector<KeySpec> keys;
-  // runtime
   wstring cfgPath, exePath;
   vector<wstring> allCfgPaths;
   bool cfgFound = false, exeFound = false, patched = false;
   bool hovPatch = false, hovLaunch = false;
 };
 
-// Global state
 static HWND g_hWnd = nullptr;
 static vector<Monitor> g_mons;
 static vector<DispMode> g_all, g_filt;
@@ -143,7 +135,6 @@ struct BtnSt {
 };
 static BtnSt g_bApply, g_bRestore, g_bClose, g_bMin;
 
-// Tray icon functions
 static void AddTrayIcon(HWND hWnd) {
   g_nid.cbSize = sizeof(NOTIFYICONDATA);
   g_nid.hWnd = hWnd;
@@ -175,7 +166,6 @@ static void RestoreFromTray(HWND hWnd) {
   RemoveTrayIcon();
 }
 
-// Helper functions
 static HFONT MkFont(int pts, int w = FW_NORMAL, bool ital = false,
                     const wchar_t *face = L"Segoe UI") {
   return CreateFont(-MulDiv(pts, GetDeviceCaps(GetDC(nullptr), LOGPIXELSY), 72),
@@ -243,13 +233,11 @@ static vector<wstring> ResolveWildAll(const wstring &tpl) {
     if (n == L"." || n == L"..")
       continue;
     wstring cand = dir + n + (rest.empty() ? L"" : L"\\" + rest);
-    
-    // If there's more wildcards, recurse
+
     if (rest.find(L'*') != wstring::npos) {
       auto subRes = ResolveWildAll(cand);
       results.insert(results.end(), subRes.begin(), subRes.end());
     } else {
-      // No more wildcards, check if file exists
       if (GetFileAttributes(cand.c_str()) != INVALID_FILE_ATTRIBUTES) {
         results.push_back(cand);
       }
@@ -284,11 +272,9 @@ static wstring GetSteamPath() {
   return p;
 }
 
-// Game profile database
 static void InitProfiles() {
   wstring stm = GetSteamPath();
 
-  // Valorant
   g_profs.push_back({L"Valorant",
                      L"VAL",
                      RGB(255, 70, 84),
@@ -314,7 +300,6 @@ static void InitProfiles() {
                          {L"FullscreenMode", L"2"},
                      }});
 
-  // CS2
   g_profs.push_back({L"Counter-Strike 2",
                      L"CS2",
                      RGB(240, 165, 0),
@@ -328,7 +313,6 @@ static void InitProfiles() {
                          {L"setting.fullscreen", L"1"},
                      }});
 
-  // Fortnite
   g_profs.push_back(
       {L"Fortnite",
        L"FN",
@@ -348,7 +332,6 @@ static void InitProfiles() {
            {L"LastConfirmedFullscreenMode", L"1"},
        }});
 
-  // Apex Legends
   g_profs.push_back(
       {L"Apex Legends",
        L"APX",
@@ -362,7 +345,6 @@ static void InitProfiles() {
            {L"setting.fullscreen", L"1"},
        }});
 
-  // Rainbow Six Siege
   g_profs.push_back(
       {L"Rainbow Six Siege",
        L"R6",
@@ -378,7 +360,6 @@ static void InitProfiles() {
            {L"WindowStyle", L"2"},
        }});
 
-  // Overwatch 2
   g_profs.push_back({L"Overwatch 2",
                      L"OW2",
                      RGB(250, 165, 0),
@@ -392,7 +373,6 @@ static void InitProfiles() {
                          {L"DisplayMode", L"2"},
                      }});
 
-  // Minecraft Java
   g_profs.push_back(
       {L"Minecraft Java",
        L"MC",
@@ -405,12 +385,11 @@ static void InitProfiles() {
            {L"overrideHeight", L"H"},
        }});
 
-  // Roblox
   g_profs.push_back(
       {L"Roblox",
        L"ROB",
        RGB(226, 35, 26),
-       L"", // no config patch supported (JSON format)
+       L"",
        L"%LOCALAPPDATA%\\Roblox\\Versions\\*\\RobloxPlayerBeta.exe",
        CfgFmt::INI,
        {}});
@@ -433,7 +412,6 @@ static void ResolveProfiles() {
   }
 }
 
-// Patching dispatch
 static bool DoPatch(GameProfile &p, DWORD w, DWORD h) {
   if (!p.cfgFound)
     return false;
@@ -446,10 +424,9 @@ static bool DoPatch(GameProfile &p, DWORD w, DWORD h) {
     else
       vals[k.key] = k.val;
   }
-  
-  // Patch all found config files
+
   int successCount = 0;
-  
+
   for (auto &cfgPath : p.allCfgPaths) {
     bool ok = false;
     switch (p.fmt) {
@@ -467,13 +444,12 @@ static bool DoPatch(GameProfile &p, DWORD w, DWORD h) {
       successCount++;
     }
   }
-  
+
   if (successCount > 0)
     p.patched = true;
   return successCount > 0;
 }
 
-// Display enumeration
 static void EnumMons() {
   g_mons.clear();
   DISPLAY_DEVICE dd{};
@@ -663,7 +639,6 @@ static void RestoreRes(HWND hWnd) {
   SetStat(L"[OK] Restored to native resolution.", CLR_SUCCESS);
 }
 
-// Drawing helpers
 static void DrawRR(HDC hdc, RECT r, int rx, int ry, COLORREF fill,
                    COLORREF brd = 0, int bw = 0) {
   HBRUSH hb = CreateSolidBrush(fill);
@@ -697,7 +672,6 @@ static void ClipToRect(HDC hdc, const RECT &r) {
   DeleteObject(rgn);
 }
 
-// Card layout helpers
 static int CardY(int i) { return GAREA_TOP + i * CARD_H - g_scrollY; }
 static int MaxScroll() {
   int total = (int)g_profs.size() * CARD_H;
@@ -705,12 +679,10 @@ static int MaxScroll() {
   return max(0, total - vis);
 }
 
-// Window procedure
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
   switch (msg) {
 
   case WM_CREATE: {
-    // Monitor combo
     HWND hM = CreateWindow(
         WC_COMBOBOX, nullptr,
         WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 20, 118,
@@ -718,7 +690,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     SetWindowTheme(hM, L"DarkMode_CFD", nullptr);
     SendMessage(hM, WM_SETFONT, (WPARAM)g_fMed, TRUE);
 
-    // Aspect combo
     HWND hA = CreateWindow(
         WC_COMBOBOX, nullptr,
         WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 20, 208, 220,
@@ -729,7 +700,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       SendMessage(hA, CB_ADDSTRING, 0, (LPARAM)ASPECTS[i].lbl);
     SendMessage(hA, CB_SETCURSEL, 0, 0);
 
-    // Resolution combo
     HWND hR = CreateWindow(
         WC_COMBOBOX, nullptr,
         WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 20, 298,
@@ -737,7 +707,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     SetWindowTheme(hR, L"DarkMode_CFD", nullptr);
     SendMessage(hR, WM_SETFONT, (WPARAM)g_fMed, TRUE);
 
-    // Hz combo
     HWND hHz = CreateWindow(
         WC_COMBOBOX, nullptr,
         WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 248, 208,
@@ -745,7 +714,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     SetWindowTheme(hHz, L"DarkMode_CFD", nullptr);
     SendMessage(hHz, WM_SETFONT, (WPARAM)g_fMed, TRUE);
 
-    // Fill monitors
     EnumMons();
     for (auto &m : g_mons) {
       wstring lbl = m.name;
@@ -761,7 +729,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       PopRes(hWnd);
     }
 
-    // Game profiles
     InitProfiles();
     ResolveProfiles();
 
@@ -779,12 +746,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     HBITMAP mbmp = CreateCompatibleBitmap(hdc, wrc.right, wrc.bottom);
     HBITMAP obmp = (HBITMAP)SelectObject(mdc, mbmp);
 
-    // Background
     HBRUSH bgBr = CreateSolidBrush(CLR_BG);
     FillRect(mdc, &wrc, bgBr);
     DeleteObject(bgBr);
 
-    // Title bar
     RECT tbar = {0, 0, wrc.right, 72};
     HBRUSH pb = CreateSolidBrush(CLR_PANEL);
     FillRect(mdc, &tbar, pb);
@@ -804,7 +769,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     DrawText(mdc, L"Patch game configs + change display resolution", -1, &sr,
              DT_LEFT | DT_TOP | DT_SINGLELINE);
 
-    // Close/Min
     {
       RECT rc2 = {wrc.right - 34, 14, wrc.right - 6, 38};
       RECT rm = {wrc.right - 70, 14, wrc.right - 38, 38};
@@ -814,14 +778,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
               g_bClose.press, 7);
     }
 
-    // ── Section 1: Monitor ───────────────────────────────
     DrawRR(mdc, {12, 78, wrc.right - 12, 155}, 10, 10, CLR_CARD, CLR_BORDER, 1);
     SelectObject(mdc, g_fBig);
     SetTextColor(mdc, CLR_ACCENT);
     RECT lm = {22, 83, 300, 103};
     DrawText(mdc, L"MONITOR", -1, &lm, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-    // ── Section 2: Aspect + Hz ───────────────────────────
     DrawRR(mdc, {12, 162, wrc.right - 12, 248}, 10, 10, CLR_CARD, CLR_BORDER,
            1);
     SelectObject(mdc, g_fBig);
@@ -833,7 +795,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     DrawText(mdc, L"REFRESH RATE", -1, &lh,
              DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-    // ── Section 3: Resolution ────────────────────────────
     DrawRR(mdc, {12, 255, wrc.right - 12, 340}, 10, 10, CLR_CARD, CLR_BORDER,
            1);
     SelectObject(mdc, g_fBig);
@@ -842,7 +803,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     DrawText(mdc, L"RESOLUTION", -1, &lr,
              DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-    // ── Apply / Restore buttons ───────────────────────────
     DrawBtn(mdc, {20, 348, 250, 394}, L"Apply Stretch", CLR_ACCENT,
             CLR_TEXT, g_fBig, g_bApply.hov, g_bApply.press, 12);
     COLORREF resBg = g_applied ? CLR_DANGER : CLR_MUTED;
@@ -850,7 +810,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     DrawBtn(mdc, {258, 348, wrc.right - 20, 394}, L"Restore Native", resBg,
             resFg, g_fBig, g_bRestore.hov, g_bRestore.press, 12);
 
-    // ── Status ────────────────────────────────────────────
     if (g_applied) {
       HBRUSH db = CreateSolidBrush(CLR_SUCCESS);
       SelectObject(mdc, db);
@@ -863,7 +822,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     DrawText(mdc, g_statTxt.c_str(), -1, &str2,
              DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-    // ── GPU Tip banner ────────────────────────────────────
     DrawRR(mdc, {12, 427, wrc.right - 12, 453}, 8, 8, RGB(40, 35, 8),
            CLR_WARNING, 1);
     SelectObject(mdc, g_fSm);
@@ -874,7 +832,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
              L"Stretched (NVIDIA/AMD)",
              -1, &gt, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-    // ── Game profiles header ──────────────────────────────
     {
       HPEN lp = CreatePen(PS_SOLID, 1, CLR_BORDER);
       SelectObject(mdc, lp);
@@ -888,7 +845,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     DrawText(mdc, L"GAME PROFILES - click Patch Config to apply stretch", -1,
              &gh, DT_LEFT | DT_TOP | DT_SINGLELINE);
 
-    // ── Game cards (clipped, scrollable) ─────────────────
     HRGN clip = CreateRectRgn(0, GAREA_TOP, wrc.right, GAREA_BOT);
     SelectClipRgn(mdc, clip);
     DeleteObject(clip);
@@ -903,7 +859,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       RECT card = {12, y, wrc.right - 16, y + CARD_H - 3};
       DrawRR(mdc, card, 10, 10, CLR_CARD, CLR_BORDER, 1);
 
-      // Tag badge
       RECT badge = {22, y + 14, 62, y + CARD_H - 14};
       DrawRR(mdc, badge, 8, 8, p.clr, 0, 0);
       SelectObject(mdc, g_fTag);
@@ -912,14 +867,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       DrawText(mdc, p.tag.c_str(), -1, &badge,
                DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
-      // Name
       SelectObject(mdc, g_fBig);
       SetTextColor(mdc, CLR_TEXT);
       RECT nm = {72, y + 10, wrc.right - 220, y + 30};
       DrawText(mdc, p.name.c_str(), -1, &nm,
                DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-      // Config path / status
       SelectObject(mdc, g_fSm);
       if (p.patched) {
         SetTextColor(mdc, CLR_SUCCESS);
@@ -945,7 +898,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                  DT_LEFT | DT_VCENTER | DT_SINGLELINE);
       }
 
-      // Patch button
       bool canPatch = p.cfgFound && !p.cfgTpl.empty();
       COLORREF pbg = canPatch ? CLR_ACCENT : CLR_MUTED;
       COLORREF pfg = canPatch ? CLR_TEXT : CLR_SUBTEXT;
@@ -953,7 +905,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       DrawBtn(mdc, pb2, L"Patch Config", pbg, pfg, g_fSm,
               p.hovPatch && canPatch, false, 8);
 
-      // Launch button
       bool canLaunch = p.exeFound;
       COLORREF lbg = canLaunch ? RGB(45, 45, 65) : CLR_MUTED;
       COLORREF lfg = canLaunch ? CLR_TEXT : CLR_SUBTEXT;
@@ -962,7 +913,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
               false, 8);
     }
 
-    // ── Scrollbar ─────────────────────────────────────────
     SelectClipRgn(mdc, nullptr);
     int mx = MaxScroll();
     if (mx > 0) {
@@ -972,7 +922,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       DrawRR(mdc, bar, 4, 4, CLR_MUTED, 0, 0);
     }
 
-    // ── Footer ────────────────────────────────────────────
     SelectObject(mdc, g_fSm);
     SetTextColor(mdc, RGB(50, 50, 75));
     RECT ft = {0, FOOTER_Y, wrc.right, WIN_H};
@@ -1013,7 +962,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     RECT wrc;
     GetClientRect(hWnd, &wrc);
 
-    // Titlebar controls
     {
       RECT rc = {wrc.right - 34, 14, wrc.right - 6, 38};
       if (PtInRect(&rc, pt)) {
@@ -1029,7 +977,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       }
     }
 
-    // Apply/Restore
     {
       RECT rc = {20, 348, 250, 394};
       if (PtInRect(&rc, pt)) {
@@ -1053,7 +1000,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       }
     }
 
-    // Game card buttons
     if (pt.y >= GAREA_TOP && pt.y < GAREA_BOT) {
       for (int i = 0; i < (int)g_profs.size(); ++i) {
         int y = CardY(i);
@@ -1093,7 +1039,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       return 0;
     }
 
-    // Drag
     if (pt.y < 68) {
       g_drag = true;
       g_dragPt = pt;
@@ -1125,7 +1070,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     chk(g_bApply, 20, 348, 250, 394);
     chk(g_bRestore, 258, 348, wrc.right - 20, 394);
 
-    // Game cards hover
     if (pt.y >= GAREA_TOP && pt.y < GAREA_BOT) {
       for (int i = 0; i < (int)g_profs.size(); ++i) {
         int y = CardY(i);
@@ -1174,7 +1118,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     }
     return 0;
 
-  case 0x0138: // WM_CTLCOLORCOMBOBOX
+  case 0x0138:
   case WM_CTLCOLOREDIT:
   case WM_CTLCOLORLISTBOX: {
     HDC hdc = (HDC)wParam;
@@ -1208,7 +1152,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
   return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-// Entry point
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
   INITCOMMONCONTROLSEX icc{sizeof(icc), ICC_STANDARD_CLASSES};
   InitCommonControlsEx(&icc);
