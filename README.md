@@ -7,7 +7,7 @@
 7. Scroll down to **Game Profiles** section
 8. Click **Patch Config** on your game to update its config files
 9. Click **Launch** to start the game, or launch it manually
-10. When done gaming, click ↩ **Restore Native** or close the app
+10. When done gaming, click **Restore Native** or close the app
 
 ---
 
