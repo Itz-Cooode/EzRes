@@ -25,3 +25,15 @@ The app automatically detects and patches config files for:
 | Overwatch 2 | OW2 | INI | ✓ |
 | Minecraft Java | MC | Colon KV | ✓ |
 | Roblox | ROB | N/A | Launch only |
+
+---
+
+## Popular Stretched Presets
+
+| Aspect | Resolution | Effect |
+|--------|-----------|--------|
+| 4:3 | 1280×960 | pro stretch res |
+| 4:3 | 1440×1080 | stretched |
+| 4:3 | 800×600 | low-end pc stretch res |
+| 5:4 | 1280×1024 | best stretch res |
+
