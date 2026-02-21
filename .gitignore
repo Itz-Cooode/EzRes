@@ -1,0 +1,28 @@
+# Build outputs
+x64/
+Debug/
+Release/
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.log
+*.idb
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+
+# Backup files
+*.bak
+*.ezres.bak
+*.stretchres.bak
+
+# Temporary files
+*.tmp
+build_out.txt
